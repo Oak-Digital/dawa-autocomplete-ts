@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.prettierrc.yaml
+.eslintrc.cjs
+env.d.ts
+*.config.ts

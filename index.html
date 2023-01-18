@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@1.x.x/css/pico.min.css">
+    <title>Dawa Autocomplete Demo App</title>
+</head>
+
+<body>
+    <main class="container">
+        <header>
+            <h1>DAWA Autocomplete</h1>
+        </header>
+        <section x-data="{ search: '' }">
+            <label for="dawa-input">
+                <input type="text" id="dawa-input" name="search" x-model="search" placeholder="Søg after adresse">
+            </label>
+            <article x-show="search.length">
+                <div class="result-list" id="result-list">
+                </div>
+            </article>
+            <span id="dawa-input-reset" role="button" class="secondary">Ryd søgning</span>
+        </section>
+        <section>
+            <h2>Valgt objekt:</h2>
+            <pre id="dawa-selected">
+            </pre>
+        </section>
+
+        <footer>
+            <script type="module" src="/lib/demo.ts"></script>
+            <style>
+                :root {
+                    --primary: #e53935;
+                }
+
+                pre {
+                    padding: 0.5rem;
+                }
+
+                .result-list {
+                    display: flex;
+                    flex-direction: column;
+                }
+
+                .result-list>span {
+                    padding: 0.5rem;
+                    cursor: pointer;
+                }
+
+                .result-list>span:hover {
+                    background-color: var(--dropdown-hover-background-color);
+                }
+
+            </style>
+        </footer>
+    </main>
+</body>
+
+</html>
