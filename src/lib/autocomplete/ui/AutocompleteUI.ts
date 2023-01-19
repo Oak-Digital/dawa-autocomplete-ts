@@ -50,12 +50,12 @@ export class AutocompleteUI {
         if (!this.resultList) return;
 
         this.resultList.innerHTML = '';
-        this.controller.getResults().forEach((el, idx) => {
+        this.controller.getResults().forEach((el) => {
             const listItem = document.createElement('span');
             listItem.innerHTML = el.forslagstekst;
 
             listItem.addEventListener('click', () => {
-                this.controller.select(idx);
+                this.controller.select(el);
                 if (this.onSelect) this.onSelect();
             });
 

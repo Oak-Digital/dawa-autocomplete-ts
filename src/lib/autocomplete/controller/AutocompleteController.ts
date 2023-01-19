@@ -43,6 +43,8 @@ export class AutocompleteController {
     private caretPosition = 0;
 
     public onUpdate: (() => void) | null = null;
+    public onSelect: ((selected: GetAutocompleteResponse) => void) | null = null;
+
     private updateAction: () => void;
 
     constructor(options?: ControllerOptions) {
@@ -114,12 +116,12 @@ export class AutocompleteController {
         return this.selectedItem;
     }
 
-    select(item: number) {
-        if (item < 0 || item >= this.resultList.length) return false;
-        this.selectedItem = this.resultList[item];
-        this.caretPosition = this.selectedItem.caretpos;
+    select(item: GetAutocompleteResponse) {
+        this.selectedItem = item;
+        this.caretPosition = item.caretpos;
 
         this.update(this.selectedItem.tekst, this.caretPosition);
+        if (this.onSelect) this.onSelect(this.selectedItem);
 
         return true;
     }
