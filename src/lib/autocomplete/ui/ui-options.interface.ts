@@ -2,9 +2,9 @@ import { AutocompleteController } from '../controller/AutocompleteController';
 import { ControllerOptions } from '../controller/controller-options.interface';
 
 export interface UIOptions {
-    minInputLength: number;
+    minInputLength?: number;
 
-    debounce: boolean;
+    debounce?: boolean;
     debounceDelay?: number;
     debounceMaxWait?: number;
 

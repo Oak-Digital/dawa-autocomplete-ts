@@ -1,13 +1,5 @@
-import { debounce, DebounceSettings } from 'lodash';
 import { AutocompleteController } from '../controller/AutocompleteController';
 import { UIOptions } from './ui-options.interface';
-
-const defaultOptions: UIOptions = {
-    minInputLength: 2,
-    debounce: true,
-    debounceDelay: 300,
-    debounceMaxWait: 500,
-};
 
 export class AutocompleteUI {
     options: UIOptions;
@@ -21,30 +13,15 @@ export class AutocompleteUI {
     public onSelect?: () => void;
 
     constructor(inputField: HTMLInputElement, options?: UIOptions) {
-        this.options = options ?? defaultOptions;
+        this.options = options ?? {};
 
         // Set input field
         this.inputField = inputField;
-
-        // On change callback
-        const debounceOptions: DebounceSettings = {
-            maxWait: this.options.debounceMaxWait ?? defaultOptions.debounceMaxWait,
-        };
-        this.inputField.addEventListener(
-            'input',
-            this.options.debounce
-                ? debounce(
-                      () => this.onChange(),
-                      this.options.debounceDelay ?? defaultOptions.debounceDelay,
-                      debounceOptions
-                  )
-                : this.onChange
-        );
+        this.inputField.addEventListener('input', this.onChange);
 
         // Set controller
         this.controller = this.options.controller ?? new AutocompleteController(this.options.controllerOptions);
-        this.controller.setOnResolved(() => this.onResolve());
-        this.controller.setOnUpdate(() => this.onUpdate());
+        this.controller.onUpdate = () => this.onUpdate();
     }
 
     setSingleResultArea(element: HTMLElement) {
@@ -64,11 +41,12 @@ export class AutocompleteUI {
         const caretPosition = this.inputField.selectionStart ?? q.length;
 
         // Discard update if value is under minimum character length
-        if (q.length <= this.options.minInputLength) return;
+        const minInputLength = this.options.minInputLength ?? 2;
+        if (q.length <= minInputLength) return;
         this.controller.update(q, caretPosition);
     }
 
-    private onResolve() {
+    private onUpdate() {
         if (!this.resultList) return;
 
         this.resultList.innerHTML = '';
@@ -83,10 +61,5 @@ export class AutocompleteUI {
 
             this.resultList?.appendChild(listItem);
         });
-    }
-
-    private onUpdate() {
-        this.inputField.value = this.controller.getQuery();
-        this.inputField.focus();
     }
 }

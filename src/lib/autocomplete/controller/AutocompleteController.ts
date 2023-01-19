@@ -1,8 +1,8 @@
 import axios, { AxiosInstance } from 'axios';
+import { debounce } from 'lodash';
 import { ControllerOptions } from './controller-options.interface';
 
 const defaultOptions: ControllerOptions = {
-    minLength: 2,
     retryDelay: 500,
     type: 'adresse',
     baseUrl: 'https://dawa.aws.dk',
@@ -10,6 +10,13 @@ const defaultOptions: ControllerOptions = {
     stormodtagerpostnumre: true,
     supplerendebynavn: true,
     fuzzy: true,
+    pageSize: 5,
+
+    minLength: 2,
+
+    debounce: true,
+    debounceDelay: 300,
+    debounceMaxWait: 500,
 };
 
 type GetAutocompleteResponse = {
@@ -35,16 +42,28 @@ export class AutocompleteController {
     private query = '';
     private caretPosition = 0;
 
-    onResolved: (() => void) | null = null;
-    onUpdate: (() => void) | null = null;
+    public onUpdate: (() => void) | null = null;
+    private updateAction: () => void;
 
     constructor(options?: ControllerOptions) {
         options = Object.assign({}, defaultOptions, options || {});
         this.options = options;
 
         this.client = axios.create({
-            baseURL: options.baseUrl,
+            baseURL: options.baseUrl ?? defaultOptions.baseUrl,
         });
+
+        this.updateAction = this.options.debounce
+            ? debounce(
+                  () => {
+                      this.doUpdate();
+                  },
+                  this.options.debounceDelay,
+                  { maxWait: this.options.debounceMaxWait }
+              )
+            : () => {
+                  this.doUpdate();
+              };
     }
 
     private async resolve(request: RequestOptions) {
@@ -52,10 +71,11 @@ export class AutocompleteController {
             params: {
                 q: request.query,
                 caretpos: request.caretPosition,
-                type: this.options.type,
-                fuzzy: this.options.fuzzy ? '' : undefined,
-                supplerendebynavn: this.options.supplerendebynavn,
-                stormodtagerpostnumre: this.options.stormodtagerpostnumre,
+                type: this.options.type ?? defaultOptions.type,
+                fuzzy: this.options.fuzzy ?? defaultOptions.fuzzy ? '' : undefined,
+                supplerendebynavn: this.options.supplerendebynavn ?? defaultOptions.supplerendebynavn,
+                stormodtagerpostnumre: this.options.stormodtagerpostnumre ?? defaultOptions.stormodtagerpostnumre,
+                per_side: this.options.pageSize ?? defaultOptions.pageSize,
             },
         });
     }
@@ -63,19 +83,19 @@ export class AutocompleteController {
     async update(query: string, caretPosition: number) {
         this.query = query;
         this.caretPosition = caretPosition;
+        this.updateAction();
+    }
 
-        try {
-            const { data, status } = await this.resolve({ query, caretPosition });
+    private doUpdate() {
+        this.resolve({ query: this.query, caretPosition: this.caretPosition })
+            .then(({ data }) => {
+                this.resultList = data;
 
-            console.debug('Remote answer with status: ', status);
-
-            this.resultList = data;
-            if (this.onResolved) this.onResolved();
-        } catch (e) {
-            console.error(e);
-        } finally {
-            if (this.onUpdate) this.onUpdate();
-        }
+                if (this.onUpdate) this.onUpdate();
+            })
+            .catch((e) => {
+                console.error(e);
+            });
     }
 
     getCaretPosition() {
@@ -97,22 +117,11 @@ export class AutocompleteController {
     select(item: number) {
         if (item < 0 || item >= this.resultList.length) return false;
         this.selectedItem = this.resultList[item];
-
-        console.debug('Selected item: ', this.selectedItem);
-
         this.caretPosition = this.selectedItem.caretpos;
 
         this.update(this.selectedItem.tekst, this.caretPosition);
 
         return true;
-    }
-
-    setOnResolved(func: () => void) {
-        this.onResolved = func;
-    }
-
-    setOnUpdate(func: () => void) {
-        this.onUpdate = func;
     }
 
     reset() {

@@ -29,26 +29,14 @@ export default defineConfig({
             formats: ['es', 'cjs', 'iife'],
             fileName: (format) => fileName[format],
         },
+        rollupOptions: {
+            external: ['lodash', 'axios'],
+            output: {
+                globals: {
+                    lodash: 'Lodash',
+                    axios: 'Axios',
+                },
+            },
+        },
     },
 });
-
-// export default defineConfig({
-//     build: {
-//         lib: {
-//             // Could also be a dictionary or array of multiple entry points
-//             entry: resolve(__dirname, 'src/main.ts'),
-//             name: 'DawaAutocompleteTS',
-//             // the proper extensions will be added
-//             fileName: 'dawa-autocomplete-ts',
-//         },
-//         rollupOptions: {
-//             external: ['lodash', 'axios'],
-//             output: {
-//                 globals: {
-//                     lodash: 'Lodash',
-//                     axios: 'Axios',
-//                 },
-//             },
-//         },
-//     },
-// });
