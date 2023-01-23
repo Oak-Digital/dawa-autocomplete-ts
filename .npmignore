@@ -1,0 +1,9 @@
+.editorconfig
+.eslintignore
+.eslintrc.cjs
+.gitignore
+.prettierignore
+tsconfig.json
+vite.config.*
+dts-bundle-generator.config.*
+src/
