@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { debounce } from 'lodash';
+import { debounce } from '../../helper/debounce';
 import { ControllerOptions } from './controller-options.interface';
 
 const defaultOptions: ControllerOptions = {
@@ -45,7 +45,7 @@ export class AutocompleteController {
     public onUpdate: (() => void) | null = null;
     public onSelect: ((selected: GetAutocompleteResponse) => void) | null = null;
 
-    private updateAction: () => void;
+    private updateAction: () => Promise<void>;
 
     constructor(options?: ControllerOptions) {
         options = Object.assign({}, defaultOptions, options || {});
@@ -55,17 +55,15 @@ export class AutocompleteController {
             baseURL: options.baseUrl ?? defaultOptions.baseUrl,
         });
 
-        this.updateAction = this.options.debounce
-            ? debounce(
-                  () => {
-                      this.doUpdate();
-                  },
-                  this.options.debounceDelay,
-                  { maxWait: this.options.debounceMaxWait }
-              )
-            : () => {
-                  this.doUpdate();
-              };
+        const [debouncedFunc, teardown] = debounce<void>(
+            () => {
+                this.doUpdate();
+            },
+            this.options.debounceDelay ?? defaultOptions.debounceDelay,
+            this.options.debounceMaxWait ?? defaultOptions.debounceMaxWait
+        );
+
+        this.updateAction = debouncedFunc;
     }
 
     private async resolve(request: RequestOptions) {

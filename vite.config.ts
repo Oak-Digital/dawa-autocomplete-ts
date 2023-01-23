@@ -21,6 +21,9 @@ const fileName = {
 };
 
 export default defineConfig({
+    server: {
+        cors: { origin: '*' },
+    },
     base: './',
     build: {
         lib: {

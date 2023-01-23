@@ -17,7 +17,7 @@ export class AutocompleteUI {
 
         // Set input field
         this.inputField = inputField;
-        this.inputField.addEventListener('input', this.onChange);
+        this.inputField.addEventListener('input', () => this.onChange());
 
         // Set controller
         this.controller = this.options.controller ?? new AutocompleteController(this.options.controllerOptions);
