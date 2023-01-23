@@ -1,18 +1,18 @@
 export function debounce<A = unknown, R = void>(
     fn: (args: A) => R,
-    ms = 300,
-    maxWait = 500
+    ms: number,
+    maxWait: number
 ): [(args: A) => Promise<R>, () => void] {
-    let timer: NodeJS.Timeout;
+    let timer: number | undefined;
     let lastInvokeTime: number | undefined;
 
     const debouncedFunc = (args: A): Promise<R> =>
         new Promise((resolve) => {
             if (lastInvokeTime && Date.now() < lastInvokeTime + maxWait) {
                 if (timer) {
-                    clearTimeout(timer);
+                    window.clearTimeout(timer);
                 }
-                timer = setTimeout(() => {
+                timer = window.setTimeout(() => {
                     lastInvokeTime = Date.now();
                     resolve(fn(args));
                 }, ms);
@@ -22,7 +22,11 @@ export function debounce<A = unknown, R = void>(
             }
         });
 
-    const teardown = () => clearTimeout(timer);
+    const teardown = () => {
+        if (timer) {
+            window.clearTimeout(timer);
+        }
+    };
 
     return [debouncedFunc, teardown];
 }

@@ -2,7 +2,7 @@
 const packageJson = require('./package.json');
 
 const getPackageName = () => {
-    return packageJson.name;
+    return packageJson.name.split('/').pop() ?? packageJson.name;
 };
 
 const config = {

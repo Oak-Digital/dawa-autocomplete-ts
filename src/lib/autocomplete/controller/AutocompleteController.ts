@@ -55,12 +55,12 @@ export class AutocompleteController {
             baseURL: options.baseUrl ?? defaultOptions.baseUrl,
         });
 
-        const [debouncedFunc, teardown] = debounce<void>(
+        const [debouncedFunc, _teardown] = debounce<void>(
             () => {
                 this.doUpdate();
             },
-            this.options.debounceDelay ?? defaultOptions.debounceDelay,
-            this.options.debounceMaxWait ?? defaultOptions.debounceMaxWait
+            this.options.debounceDelay ?? 300,
+            this.options.debounceMaxWait ?? 500
         );
 
         this.updateAction = debouncedFunc;
