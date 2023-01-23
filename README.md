@@ -20,7 +20,11 @@ The project is yet to be tested.
 
 ## Usage
 
-TODO
+Install with
+
+```sh
+npm i @oak-digital/dawa-autocomplete-ts
+```
 
 ## Development
 
@@ -41,7 +45,8 @@ pnpm build
 - [x] Base implementation
 - [x] Demo
 - [ ] Tests
-- [ ] Publish as npm package
+- [x] Publish as npm package
+- [ ] Documentation
 - [ ] React component
 
 ## Contributing
