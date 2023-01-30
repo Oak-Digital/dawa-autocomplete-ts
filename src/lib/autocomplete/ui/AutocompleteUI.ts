@@ -51,7 +51,7 @@ export class AutocompleteUI {
 
         this.resultList.innerHTML = '';
         this.controller.getResults().forEach((el) => {
-            const listItem = document.createElement('span');
+            const listItem = document.createElement('li');
             listItem.innerHTML = el.forslagstekst;
 
             listItem.addEventListener('click', () => {
